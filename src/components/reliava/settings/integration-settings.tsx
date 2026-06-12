@@ -1,6 +1,8 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,17 +13,13 @@ import {
 } from '@/components/ui/breadcrumb';
 import { PageHeader } from '@/components/reliava/shared/page-header';
 import { useAppStore } from '@/lib/store';
+import { Plug, Lock } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // IntegrationSettings
 // ---------------------------------------------------------------------------
 export function IntegrationSettings() {
   const navigate = useAppStore((s) => s.navigate);
-
-  const apiBaseUrl =
-    process.env.NEXT_PUBLIC_API_URL || 'https://app.reliava.com';
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'Not configured';
 
   return (
     <div className="space-y-6">
@@ -54,68 +52,85 @@ export function IntegrationSettings() {
 
       <PageHeader
         title="Integrations"
-        description="Configure webhook endpoints for n8n"
+        description="Connect automation platforms to Reliava"
       />
 
-      <div className="space-y-4 max-w-2xl">
-        {/* n8n Webhook Base URL */}
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl">
+        {/* n8n — Active */}
+        <Card className="border-border">
           <CardHeader>
-            <CardTitle className="text-sm font-medium">n8n Webhook Base URL</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted rounded-md p-3 font-mono text-sm text-foreground break-all">
-              {apiBaseUrl}/api/ingest
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center size-9 rounded-lg bg-muted">
+                  <Plug className="size-4 text-foreground" />
+                </div>
+                <CardTitle className="text-sm">n8n</CardTitle>
+              </div>
+              <Badge variant="outline" className="border-emerald-500/25 bg-emerald-500/15 text-emerald-400 text-xs">
+                Active in V1
+              </Badge>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Each workflow has its own unique endpoint. Configure webhooks from the
-              Workflow Detail page.
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <CardDescription>
+              Reliava receives workflow success and failure events from n8n webhooks.
+            </CardDescription>
+            <p className="text-xs text-muted-foreground">
+              Each workflow has its own unique webhook URL. Configure webhooks from the Workflow Detail page.
             </p>
           </CardContent>
         </Card>
 
-        {/* API Configuration */}
-        <Card>
+        {/* Make — Not in V1 */}
+        <Card className="border-border opacity-50">
           <CardHeader>
-            <CardTitle className="text-sm font-medium">API Configuration</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <ConfigRow label="Webhook Timeout" value="30 seconds" />
-              <ConfigRow label="Max Payload Size" value="10 MB" />
-              <ConfigRow label="Retry Policy" value="None (MVP)" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center size-9 rounded-lg bg-muted">
+                  <Lock className="size-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-sm text-muted-foreground">Make</CardTitle>
+              </div>
+              <Badge variant="outline" className="border-zinc-500/25 bg-zinc-500/15 text-zinc-400 text-xs">
+                Not in V1
+              </Badge>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Advanced configuration options will be available in future updates.
-            </p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <CardDescription className="text-muted-foreground">
+              Make integration will be available in a future release.
+            </CardDescription>
+            <Button variant="outline" size="sm" disabled>
+              Coming soon
+            </Button>
           </CardContent>
         </Card>
 
-        {/* Environment */}
-        <Card>
+        {/* Zapier — Not in V1 */}
+        <Card className="border-border opacity-50">
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Environment</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <ConfigRow label="API Base URL" value={apiBaseUrl} />
-              <ConfigRow label="Supabase Project" value={supabaseUrl} />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center size-9 rounded-lg bg-muted">
+                  <Lock className="size-4 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-sm text-muted-foreground">Zapier</CardTitle>
+              </div>
+              <Badge variant="outline" className="border-zinc-500/25 bg-zinc-500/15 text-zinc-400 text-xs">
+                Not in V1
+              </Badge>
             </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <CardDescription className="text-muted-foreground">
+              Zapier integration will be available in a future release.
+            </CardDescription>
+            <Button variant="outline" size="sm" disabled>
+              Coming soon
+            </Button>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// ConfigRow — label + mono value row
-// ---------------------------------------------------------------------------
-function ConfigRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="font-mono text-sm text-foreground">{value}</span>
     </div>
   );
 }

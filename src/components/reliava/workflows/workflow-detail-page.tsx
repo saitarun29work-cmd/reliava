@@ -22,7 +22,6 @@ import {
   Copy,
   Eye,
   EyeOff as EyeOffIcon,
-  Terminal,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -259,46 +258,89 @@ export function WorkflowDetailPage({ workflowId }: { workflowId: string }) {
       <EventTimeline workflowId={workflow.id} />
 
       {/* ---- Bottom: n8n Setup Instructions ---- */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">n8n Setup Instructions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="space-y-3 list-decimal list-inside text-sm text-foreground">
-            <li>
-              In your n8n workflow, add an <strong>HTTP Request</strong> node at the end.
-            </li>
-            <li>
-              Set the method to <strong>POST</strong> and the URL to the webhook URL shown
-              above.
-            </li>
-            <li>
-              In the request body, send a JSON object with at minimum:
-              <div className="bg-muted rounded-md p-3 font-mono text-xs text-foreground mt-2 ml-4 break-all">
-                {'{ "outcome": "success" | "failure", "message": "Description of what happened" }'}
+      <div className="space-y-4">
+        {/* A) Success event setup */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Send success event from n8n</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Add an <strong className="text-foreground">HTTP Request</strong> node at the end of the successful path.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="text-muted-foreground">Method:</span>{' '}
+                <span className="font-medium text-foreground">POST</span>
               </div>
-            </li>
-            <li>
-              Optionally include additional metadata as key-value pairs.
-            </li>
-            <li>
-              Each workflow has its own unique webhook URL and ingest token — do not share
-              between workflows.
-            </li>
-          </ol>
+              <div>
+                <span className="text-muted-foreground">URL:</span>{' '}
+                <span className="font-mono text-xs text-primary break-all">{workflow.webhookUrl}</span>
+              </div>
+            </div>
+            <div className="bg-muted rounded-md p-3 font-mono text-xs text-foreground overflow-x-auto">
+              <pre className="whitespace-pre-wrap">{JSON.stringify({
+  platform: "n8n",
+  event_type: "success",
+  severity: "low",
+  workflow_name: "Facebook Lead to CRM",
+  business_impact: "Lead automation completed successfully",
+  payload_summary: {
+    lead_email_present: true,
+    lead_phone_present: false,
+    crm_contact_id: "crm_123",
+    whatsapp_sent: false
+  }
+}, null, 2)}</pre>
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="mt-4 bg-muted rounded-md p-3 font-mono text-xs text-foreground">
-            <p className="text-muted-foreground text-xs mb-2">{"// Example payload"}</p>
-            <pre className="whitespace-pre-wrap">{`{
-  "outcome": "success",
-  "message": "Order #1234 processed and synced to CRM",
-  "orderId": "1234",
-  "customerId": "cust_abc",
-  "processingTime": "1.2s"
-}`}</pre>
-          </div>
-        </CardContent>
-      </Card>
+        {/* B) Failure event setup */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Send failure event from n8n</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Use an <strong className="text-foreground">n8n Error Trigger</strong> workflow, then send the error to Reliava using an HTTP Request node.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+              <div>
+                <span className="text-muted-foreground">Method:</span>{' '}
+                <span className="font-medium text-foreground">POST</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">URL:</span>{' '}
+                <span className="font-mono text-xs text-primary break-all">{workflow.webhookUrl}</span>
+              </div>
+            </div>
+            <div className="bg-muted rounded-md p-3 font-mono text-xs text-foreground overflow-x-auto">
+              <pre className="whitespace-pre-wrap">{JSON.stringify({
+  platform: "n8n",
+  event_type: "failure",
+  severity: "high",
+  workflow_name: "Facebook Lead to CRM",
+  external_execution_id: "exec_456",
+  external_execution_url: "https://n8n.example.com/execution/456",
+  node_name: "CRM Sync",
+  error_message: "Invalid phone number format",
+  business_impact: "Lead was not synced to CRM",
+  payload_summary: {
+    source: "facebook_leads",
+    lead_email_present: true,
+    lead_phone_present: false
+  }
+}, null, 2)}</pre>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Shared note */}
+        <p className="text-xs text-muted-foreground px-1">
+          Each workflow has its own unique webhook URL and ingest token — do not share between workflows.
+        </p>
+      </div>
     </div>
   );
 }

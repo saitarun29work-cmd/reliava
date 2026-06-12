@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,15 +21,6 @@ import { useAppStore } from '@/lib/store';
 export function AgencySettings() {
   const agency = useAppStore((s) => s.agency);
   const navigate = useAppStore((s) => s.navigate);
-
-  const [name, setName] = useState(() => agency?.name ?? '');
-  const [contact, setContact] = useState(() => agency?.primaryContact ?? '');
-  const [email, setEmail] = useState(() => agency?.email ?? '');
-
-  const hasChanges = useMemo(() => {
-    if (!agency) return false;
-    return name !== agency.name || contact !== agency.primaryContact || email !== agency.email;
-  }, [name, contact, email, agency]);
 
   if (!agency) {
     return (
@@ -80,9 +69,9 @@ export function AgencySettings() {
               <Label htmlFor="agency-name">Agency Name</Label>
               <Input
                 id="agency-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your agency name"
+                value={agency.name}
+                disabled
+                className="bg-muted/50"
               />
             </div>
 
@@ -91,9 +80,9 @@ export function AgencySettings() {
               <Label htmlFor="primary-contact">Primary Contact</Label>
               <Input
                 id="primary-contact"
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                placeholder="Contact person name"
+                value={agency.primaryContact}
+                disabled
+                className="bg-muted/50"
               />
             </div>
 
@@ -103,13 +92,13 @@ export function AgencySettings() {
               <Input
                 id="agency-email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="contact@agency.com"
+                value={agency.email}
+                disabled
+                className="bg-muted/50"
               />
             </div>
 
-            {/* Plan (read-only badge) */}
+            {/* Plan */}
             <div className="space-y-2">
               <Label>Plan</Label>
               <div>
@@ -119,7 +108,7 @@ export function AgencySettings() {
               </div>
             </div>
 
-            {/* Slug (read-only) */}
+            {/* Slug */}
             <div className="space-y-2">
               <Label>Slug</Label>
               <div className="bg-muted rounded-md px-3 py-2 font-mono text-sm text-foreground">
@@ -127,10 +116,10 @@ export function AgencySettings() {
               </div>
             </div>
 
-            {/* Save */}
-            <Button disabled={!hasChanges} onClick={() => {}}>
-              Save Changes
-            </Button>
+            {/* V1 note */}
+            <p className="text-sm text-muted-foreground pt-2 border-t border-border">
+              Editing agency profile will be available after backend is connected.
+            </p>
           </div>
         </CardContent>
       </Card>
