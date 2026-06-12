@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---- Agency ----
+model Agency {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  logoUrl      String?
+  primaryContact String
+  email        String
+  plan         String   @default("starter") // starter | pro | enterprise
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  clients      Client[]
+  users        User[]
+  issueRules   IssueRule[]
+}
+
+// ---- User (linked to Supabase Auth) ----
+model User {
+  id           String   @id @default(cuid())
+  supabaseUid  String?  @unique  // Supabase Auth user ID
+  email        String   @unique
+  name         String
+  agencyId     String
+  role         String   @default("member") // owner | admin | member
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  agency       Agency   @relation(fields: [agencyId], references: [id])
+}
+
+// ---- Client ----
+model Client {
+  id             String   @id @default(cuid())
+  agencyId       String
+  name           String
+  slug           String
+  industry       String?
+  contactName    String
+  contactEmail   String
+  healthScore    Int      @default(100)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  agency         Agency   @relation(fields: [agencyId], references: [id])
+  workflows      Workflow[]
+  reports        Report[]
+}
+
+// ---- Workflow (one unique ingest token + one unique webhook URL) ----
+model Workflow {
+  id                  String   @id @default(cuid())
+  clientId            String
+  name                String
+  platform            String   @default("n8n")
+  businessProcess     String
+  criticality         String   @default("medium") // low | medium | high | critical
+  status              String   @default("healthy") // healthy | warning | critical | inactive
+  healthScore         Int      @default(100)
+  lastSuccessAt       DateTime?
+  lastFailureAt       DateTime?
+  failureCountThisWeek Int     @default(0)
+  silentIssueCount    Int      @default(0)
+  lastEventReceivedAt DateTime?
+  ingestToken         String   @unique
+  webhookUrl          String   @unique
+  n8nWebhookId        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  client              Client   @relation(fields: [clientId], references: [id])
+  events              WorkflowEvent[]
+  alerts              Alert[]
+}
+
+// ---- WorkflowEvent ----
+model WorkflowEvent {
+  id            String   @id @default(cuid())
+  workflowId    String
+  severity      String   @default("info") // info | warning | error | critical
+  outcome       String   @default("success") // success | failure
+  message       String
+  metadata      String?  // JSON string
+  isSilent      Boolean  @default(false)
+  timestamp     DateTime @default(now())
+
+  workflow      Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+// ---- IssueRule ----
+model IssueRule {
+  id            String   @id @default(cuid())
+  agencyId      String
+  name          String
+  description   String
+  condition     String
+  severity      String   @default("warning")
+  isEnabled     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  agency        Agency   @relation(fields: [agencyId], references: [id])
+  alerts        Alert[]
+}
+
+// ---- Report ----
+model Report {
+  id                 String   @id @default(cuid())
+  clientId           String
+  periodStart        DateTime
+  periodEnd          DateTime
+  status             String   @default("draft") // draft | sent | viewed
+  totalRuns          Int      @default(0)
+  successRate        Float    @default(0)
+  totalFailures      Int      @default(0)
+  meanTimeToRecovery Int      @default(0)
+  generatedAt        DateTime @default(now())
+  sentAt             DateTime?
+
+  client             Client   @relation(fields: [clientId], references: [id])
+}
+
+// ---- Alert ----
+model Alert {
+  id             String    @id @default(cuid())
+  workflowId     String
+  ruleId         String
+  severity       String    @default("warning")
+  status         String    @default("active") // active | acknowledged | resolved
+  message        String
+  triggeredAt    DateTime  @default(now())
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+
+  workflow       Workflow  @relation(fields: [workflowId], references: [id])
+  rule           IssueRule @relation(fields: [ruleId], references: [id])
+}
