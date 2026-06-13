@@ -601,11 +601,11 @@ export const mockReports: Report[] = [
     periodStart: d(7), periodEnd: d(0),
     status: 'sent',
     totalRuns: 842, successfulRuns: 818, failedRuns: 24, silentIssues: 2,
-    workflowsMonitored: 6, criticalEvents: 0,
+    workflowsMonitored: 6, criticalBusinessRisks: 2,
     healthScore: 85,
     generatedAt: d(0, 10, 0), sentAt: d(0, 10, 30),
     executiveSummary:
-      'Your automation system ran 842 times this week across 6 workflows. Most completed successfully, but 24 failed runs and 2 silent issues were detected. The biggest risk came from Order Confirmation Emails, where SendGrid timeouts meant some customers may not have received their purchase confirmations. A silent issue in Shopify to CRM Sync showed all 34 customer records were skipped in one run due to an overly aggressive dedup rule, meaning new customer data may not have reached HubSpot even though the workflow reported success.',
+      'Your automation system processed 842 workflow runs this week. Most workflows completed normally, but Reliava detected 24 failed runs and 2 silent issues where the workflow appeared successful but the business result was incomplete. The main risk this week was missed customer communication from order confirmation and CRM sync workflows.',
     healthExplanation:
       'Health is 85/100 because most workflows completed successfully and no critical errors occurred. The score reflects minor impact from SendGrid timeouts and one silent data quality issue in the CRM sync pipeline.',
     whatWorkedWell: [
@@ -619,18 +619,22 @@ export const mockReports: Report[] = [
       'Review SendGrid API timeout patterns and increase the timeout threshold or add retry logic for Order Confirmation Emails. Investigate the CRM dedup rule in Shopify to CRM Sync to confirm whether the 34 skipped records were legitimate duplicates or a misconfiguration. Verify silent issue rules for missing customer data in the sync pipeline.',
     closingNote:
       'Reliava helped detect the CRM sync issue before it showed up as missing contacts in your sales pipeline. The priority next week is stabilising email delivery and confirming the dedup configuration.',
+    priorityFixes: [
+      'Increase SendGrid timeout threshold and add retry logic for Order Confirmation Emails.',
+      'Review CRM dedup rule in Shopify to CRM Sync to prevent record skipping.',
+      'Add payload validation to verify customer records are actually created after sync.',
+    ],
   },
-  // ──── Apex Financial — current week ────
   {
     id: 'rpt_02', clientId: 'client_02', clientName: 'Apex Financial',
     periodStart: d(7), periodEnd: d(0),
     status: 'viewed',
     totalRuns: 312, successfulRuns: 311, failedRuns: 1, silentIssues: 0,
-    workflowsMonitored: 4, criticalEvents: 0,
+    workflowsMonitored: 4, criticalBusinessRisks: 0,
     healthScore: 96,
     generatedAt: d(0, 9, 0), sentAt: d(0, 9, 15),
     executiveSummary:
-      'Your automation system ran 312 times this week across 4 workflows with near-perfect reliability. Only 1 failure was recorded — a transient KYC document parsing error that self-resolved within 5 minutes. No silent issues were detected, meaning all successful runs produced complete, accurate business results.',
+      'Your automation system processed 312 workflow runs this week with near-perfect results. Only 1 failure was recorded — a transient document parsing error that self-resolved. No silent issues were detected, meaning all successful runs produced complete, accurate business results.',
     healthExplanation:
       'Health is 96/100 because all workflows operated within normal parameters. The single failure was transient and self-resolving, with no impact on data quality or compliance obligations.',
     whatWorkedWell: [
@@ -644,6 +648,7 @@ export const mockReports: Report[] = [
       'No urgent action required. Monitor the KYC Document Processing workflow for recurring transient errors during peak hours. Consider scheduling a quarterly review of KYC document format requirements to stay ahead of any upstream changes.',
     closingNote:
       'All automations are performing reliably. No client-facing issues were detected this week.',
+    priorityFixes: [],
   },
   // ──── NovaTech SaaS — current week ────
   {
@@ -651,11 +656,11 @@ export const mockReports: Report[] = [
     periodStart: d(7), periodEnd: d(0),
     status: 'draft',
     totalRuns: 1543, successfulRuns: 1298, failedRuns: 245, silentIssues: 8,
-    workflowsMonitored: 8, criticalEvents: 3,
+    workflowsMonitored: 8, criticalBusinessRisks: 5,
     healthScore: 52,
     generatedAt: d(0, 8, 0),
     executiveSummary:
-      'Your automation system ran 1,543 times this week across 8 workflows, but reliability was significantly below target. 245 runs failed and 8 silent issues were detected where workflows appeared successful but produced incomplete or risky results. Three workflows are in critical state: User Onboarding Sequence, Stripe Billing Webhook, and Revenue Dashboard Refresh. The Stripe Billing Webhook alone had 18 failures including duplicate invoice attempts and signature mismatches. Silent issues were found in Churn Risk Analysis and Revenue Dashboard Refresh, where data was stale or missing entirely.',
+      'Your automation system processed 1,543 workflow runs this week, but Reliava detected 245 failed runs and 8 silent issues where workflows appeared successful but produced incomplete or risky results. The main business risks were new users not being fully set up, potential duplicate invoices, and leadership relying on stale financial data in dashboards.',
     healthExplanation:
       'Health is 52/100 because three workflows are in critical or warning state with high failure counts and recurring silent data quality issues. The score reflects both the volume of failures and the business impact of undetected data problems in analytics and billing workflows.',
     whatWorkedWell: [
@@ -669,6 +674,11 @@ export const mockReports: Report[] = [
       'Immediately investigate the Stripe webhook signature configuration and idempotency key handling to stop duplicate invoice creation. Review the User Onboarding database connection pool settings and increase capacity to handle peak load. Audit the Revenue Dashboard Refresh cache TTL configuration and restore live query behavior. Verify silent issue detection rules for all three critical workflows. Schedule a reliability review call with the NovaTech team.',
     closingNote:
       'Reliava detected the stale dashboard data and duplicate invoice risk before either became a client complaint. The priority next week is stabilising billing workflows and restoring data freshness in analytics.',
+    priorityFixes: [
+      'Fix Stripe webhook signature validation and idempotency key handling to stop duplicate invoices.',
+      'Increase database connection pool size for User Onboarding Sequence.',
+      'Restore live query behavior in Revenue Dashboard Refresh and remove stale cache.',
+    ],
   },
   // ──── BrightPath Health — current week ────
   {
@@ -676,11 +686,11 @@ export const mockReports: Report[] = [
     periodStart: d(7), periodEnd: d(0),
     status: 'sent',
     totalRuns: 620, successfulRuns: 568, failedRuns: 52, silentIssues: 3,
-    workflowsMonitored: 5, criticalEvents: 0,
+    workflowsMonitored: 5, criticalBusinessRisks: 3,
     healthScore: 71,
     generatedAt: d(0, 7, 0), sentAt: d(0, 7, 45),
     executiveSummary:
-      'Your automation system ran 620 times this week across 5 workflows. 52 runs failed and 3 silent issues were detected. The Insurance Claim Router and Patient Appointment Reminders workflows drove most issues this week. Lab Results Ingestion and Telehealth Session Scheduler performed well with zero failures. A notable silent issue was found in Patient Appointment Reminders, where all 12 scheduled reminders could not be sent because patient phone numbers were missing from the CRM.',
+      'Your automation system processed 620 workflow runs this week. Reliava detected 52 failed runs and 3 silent issues. The biggest risk was not the failures — it was the silent issue where 12 patients did not receive appointment reminders because phone numbers were missing from the CRM, even though the reminder workflow reported success.',
     healthExplanation:
       'Health is 71/100 because two workflows — Insurance Claim Router and Patient Appointment Reminders — experienced repeated failures. The silent issue in appointment reminders is particularly concerning because it affected patient communication without triggering any error alerts.',
     whatWorkedWell: [
@@ -694,6 +704,11 @@ export const mockReports: Report[] = [
       'Investigate the CRM sync pipeline that feeds Patient Appointment Reminders to confirm why phone_number fields are being dropped. Contact the external claims API provider about the 502 errors and implement circuit-breaker logic. Review HL7 document size limits and add pre-validation before the parser step. Confirm silent issue rules are monitoring required field presence across all patient communication workflows.',
     closingNote:
       'Reliava caught the missing phone number issue that would have gone unnoticed until patients missed their appointments. The priority next week is fixing the CRM data pipeline for patient communications.',
+    priorityFixes: [
+      'Fix the CRM sync pipeline to stop dropping patient phone numbers.',
+      'Add required-field validation before the appointment reminder step.',
+      'Implement circuit-breaker logic for the external claims API to prevent cascade failures.',
+    ],
   },
   // ──── Summit Logistics — current week ────
   {
@@ -701,11 +716,11 @@ export const mockReports: Report[] = [
     periodStart: d(7), periodEnd: d(0),
     status: 'sent',
     totalRuns: 285, successfulRuns: 285, failedRuns: 0, silentIssues: 0,
-    workflowsMonitored: 3, criticalEvents: 0,
+    workflowsMonitored: 3, criticalBusinessRisks: 0,
     healthScore: 96,
     generatedAt: d(0, 6, 0), sentAt: d(0, 6, 20),
     executiveSummary:
-      'Your automation system ran 285 times this week across 3 workflows with a perfect success rate. Every run completed without errors, and no silent issues were detected — all successful runs produced complete, accurate results. This is the third consecutive week with zero incidents.',
+      'Your automation system processed 285 workflow runs this week with a perfect record. Every run completed successfully, no silent issues were detected, and all business outcomes were complete. This is the third consecutive week with zero incidents.',
     healthExplanation:
       'Health is 96/100 because all workflows are operating reliably with strong health scores. The score reflects consistent, trouble-free operation across shipment tracking, payroll, and customer notifications.',
     whatWorkedWell: [
@@ -719,6 +734,7 @@ export const mockReports: Report[] = [
       'No action required this week. Continue monitoring as usual. Consider using Summit Logistics workflows as a reliability benchmark for other clients during quarterly business reviews.',
     closingNote:
       'All automations are performing at their best. No issues were detected this week.',
+    priorityFixes: [],
   },
   // ──── GreenLeaf Commerce — previous week ────
   {
@@ -726,11 +742,11 @@ export const mockReports: Report[] = [
     periodStart: d(14), periodEnd: d(7),
     status: 'sent',
     totalRuns: 810, successfulRuns: 782, failedRuns: 28, silentIssues: 1,
-    workflowsMonitored: 6, criticalEvents: 0,
+    workflowsMonitored: 6, criticalBusinessRisks: 1,
     healthScore: 83,
     generatedAt: d(7, 10, 0), sentAt: d(7, 10, 30),
     executiveSummary:
-      'Your automation system ran 810 times last week with a 96.5% success rate. Most workflows operated normally. The Order Confirmation Emails workflow experienced 28 SendGrid timeout failures. One silent issue was detected in Review Aggregation where the source API returned zero new reviews for three consecutive runs.',
+      'Your automation system processed 810 workflow runs last week. Most completed normally. Reliava detected 28 failed runs from email timeouts and 1 silent issue where the review sync returned empty results despite reporting success.',
     healthExplanation:
       'Health is 83/100 because most workflows completed successfully and the only silent issue was low-impact. The SendGrid timeouts were the primary score detractor.',
     whatWorkedWell: [
@@ -744,6 +760,10 @@ export const mockReports: Report[] = [
       'Review SendGrid delivery logs to confirm all delayed emails were eventually delivered. Check the Review Aggregation source API for rate limiting or schema changes.',
     closingNote:
       'Reliava detected the Review Aggregation anomaly before it could affect your reputation monitoring data.',
+    priorityFixes: [
+      'Stabilise SendGrid delivery for order confirmations.',
+      'Add record-count validation to Review Aggregation success payloads.',
+    ],
   },
   // ──── NovaTech SaaS — previous week ────
   {
@@ -751,11 +771,11 @@ export const mockReports: Report[] = [
     periodStart: d(14), periodEnd: d(7),
     status: 'sent',
     totalRuns: 1480, successfulRuns: 1307, failedRuns: 173, silentIssues: 5,
-    workflowsMonitored: 8, criticalEvents: 2,
+    workflowsMonitored: 8, criticalBusinessRisks: 4,
     healthScore: 48,
     generatedAt: d(7, 8, 0), sentAt: d(7, 8, 45),
     executiveSummary:
-      'Your automation system ran 1,480 times last week with an 88.3% success rate. 173 runs failed and 5 silent issues were detected. The User Onboarding Sequence and Stripe Billing Webhook were the primary contributors to failures. Five silent issues were found across analytics workflows where data freshness and record processing rules were violated.',
+      'Your automation system processed 1,480 workflow runs last week. Reliava detected 173 failed runs and 5 silent issues. The biggest risks were incomplete user onboarding and unreliable churn risk scores that the team may have acted on.',
     healthExplanation:
       'Health is 48/100 because multiple workflows were in critical state with high failure volumes and recurring silent data quality issues. The score reflects both the number of failures and the business significance of undetected data problems.',
     whatWorkedWell: [
@@ -769,6 +789,11 @@ export const mockReports: Report[] = [
       'Prioritise database connection pool scaling for the User Onboarding Sequence. Audit all Stripe webhook event handling for idempotency and signature validation. Review analytics workflow data source configurations and refresh intervals. Schedule a reliability review call with the NovaTech team.',
     closingNote:
       'Reliava identified the data freshness issues in analytics workflows that would have led to incorrect churn risk assessments.',
+    priorityFixes: [
+      'Scale database connection pool for User Onboarding Sequence.',
+      'Audit Stripe webhook idempotency to prevent duplicate invoices.',
+      'Add data freshness validation to analytics workflow success payloads.',
+    ],
   },
 ];
 

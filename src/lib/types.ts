@@ -99,7 +99,7 @@ export interface Report {
   failedRuns: number;
   silentIssues: number;
   workflowsMonitored: number;
-  criticalEvents: number;
+  criticalBusinessRisks: number;
   healthScore: number;
   generatedAt: string;
   sentAt?: string;
@@ -108,6 +108,7 @@ export interface Report {
   healthExplanation: string;
   whatWorkedWell: string[];
   businessRiskSummary: string;
+  priorityFixes: string[];
   agencyActionSummary: string;
   closingNote: string;
 }
