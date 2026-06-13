@@ -22,7 +22,7 @@ import {
   ShieldAlert,
   ClipboardList,
 } from 'lucide-react';
-import type { Report, Workflow } from '@/lib/types';
+import type { Client, Report, Workflow } from '@/lib/types';
 
 interface ClientReportsTabProps {
   clientId: string;
@@ -95,7 +95,7 @@ function WorkflowAttentionRow({ wf }: { wf: Workflow }) {
 // ---------------------------------------------------------------------------
 // FullReport — the expanded report card
 // ---------------------------------------------------------------------------
-function FullReport({ report, workflows }: { report: Report; workflows: Workflow[] }) {
+function FullReport({ report, client, workflows }: { report: Report; client: Client | undefined; workflows: Workflow[] }) {
   const successRate =
     report.totalRuns > 0
       ? ((report.successfulRuns / report.totalRuns) * 100).toFixed(1)
@@ -128,9 +128,16 @@ function FullReport({ report, workflows }: { report: Report; workflows: Workflow
           </div>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{report.clientName}</span>
-            {' — '}
+            {client?.industry && (
+              <>
+                <span className="mx-1.5 text-border">|</span>
+                <span>{client.industry}</span>
+              </>
+            )}
+          </p>
+          <p className="text-xs text-muted-foreground">
             {format(new Date(report.periodStart), 'MMM d, yyyy')}
-            {' to '}
+            {' — '}
             {format(new Date(report.periodEnd), 'MMM d, yyyy')}
           </p>
         </div>
@@ -290,7 +297,13 @@ function PastReportRow({ report }: { report: Report }) {
 // ---------------------------------------------------------------------------
 export function ClientReportsTab({ clientId }: ClientReportsTabProps) {
   const allReports = useAppStore((s) => s.reports);
+  const allClients = useAppStore((s) => s.clients);
   const allWorkflows = useAppStore((s) => s.workflows);
+
+  const client = useMemo(
+    () => allClients.find((c) => c.id === clientId),
+    [allClients, clientId]
+  );
 
   const { currentReport, pastReports } = useMemo(() => {
     const sorted = allReports
@@ -326,7 +339,7 @@ export function ClientReportsTab({ clientId }: ClientReportsTabProps) {
       ) : (
         <>
           {/* Latest (full) report */}
-          <FullReport report={currentReport} workflows={clientWorkflows} />
+          <FullReport report={currentReport} client={client} workflows={clientWorkflows} />
 
           {/* Past reports list */}
           {pastReports.length > 0 && (
