@@ -60,3 +60,21 @@ Stage Summary:
 - 1 Prisma schema aligned
 - All 7 user-requested items verified correct
 - Build successful, no TypeScript errors
+
+---
+Task ID: 2
+Agent: main
+Task: Rewrite Client Reports page with locked V1 weekly report format
+
+Work Log:
+- Updated Report type: replaced successRate/totalFailures/meanTimeToRecovery with successfulRuns/failedRuns/silentIssues/healthScore + executiveSummary/businessRiskSummary/agencyActionSummary text fields
+- Updated all 7 mock reports with correct count formulas (totalRuns = successfulRuns + failedRuns), healthScore, and realistic narrative summaries for each section
+- Rewrote client-reports-tab.tsx: latest report shows full format (title, client+period, 5-stat grid, 3 narrative sections, top-3 workflows table), past reports show as compact rows
+- Success rate is now derived inline (successfulRuns/totalRuns) — not stored
+- Top 3 workflows sorted by (failures + silentIssues) desc, health asc
+- Build passes clean
+
+Stage Summary:
+- 3 files changed (types.ts, mock-data.ts, client-reports-tab.tsx)
+- Report format locked: total_runs = success + failure, silent_issues counted separately
+- All 5 clients have 1-2 reports with realistic narratives

@@ -595,54 +595,110 @@ export const mockIssueRules: IssueRule[] = [
 
 // ---- Reports ----
 export const mockReports: Report[] = [
+  // ──── GreenLeaf Commerce — current week ────
   {
     id: 'rpt_01', clientId: 'client_01', clientName: 'GreenLeaf Commerce',
     periodStart: d(7), periodEnd: d(0),
-    status: 'sent', totalRuns: 842, successRate: 97.2,
-    totalFailures: 24, meanTimeToRecovery: 12,
+    status: 'sent',
+    totalRuns: 842, successfulRuns: 818, failedRuns: 24, silentIssues: 2,
+    healthScore: 85,
     generatedAt: d(0, 10, 0), sentAt: d(0, 10, 30),
+    executiveSummary:
+      'GreenLeaf Commerce automation suite maintained strong reliability this week with an 97.2% success rate across 842 total workflow runs. The Shopify to CRM sync and Abandoned Cart Recovery workflows performed well, processing customer data consistently. A minor uptick in SendGrid timeouts on the Order Confirmation Emails workflow caused 24 failures, but all were recovered within 12 minutes on average.',
+    businessRiskSummary:
+      'Order Confirmation Emails experienced timeout failures this week, meaning some customers may not have received order confirmation messages immediately after purchase. Additionally, Shopify to CRM Sync had a silent issue where all 34 customer records were skipped due to an overly aggressive dedup rule, meaning new customer data may not have reached HubSpot.',
+    agencyActionSummary:
+      'Review SendGrid API timeout patterns and consider increasing the timeout threshold or adding retry logic for the Order Confirmation Emails workflow. Investigate the CRM dedup rule in Shopify to CRM Sync to confirm whether the 34 skipped records were legitimate duplicates or a misconfiguration. Verify silent issue rules for missing customer data in the sync pipeline.',
   },
+  // ──── Apex Financial — current week ────
   {
     id: 'rpt_02', clientId: 'client_02', clientName: 'Apex Financial',
     periodStart: d(7), periodEnd: d(0),
-    status: 'viewed', totalRuns: 312, successRate: 99.7,
-    totalFailures: 1, meanTimeToRecovery: 5,
+    status: 'viewed',
+    totalRuns: 312, successfulRuns: 311, failedRuns: 1, silentIssues: 0,
+    healthScore: 96,
     generatedAt: d(0, 9, 0), sentAt: d(0, 9, 15),
+    executiveSummary:
+      'Apex Financial workflows delivered near-perfect reliability this week with a 99.7% success rate across 312 runs. All four workflows — Daily Portfolio Report, KYC Document Processing, and Regulatory Filing Reminder — operated within normal parameters. The single failure was a transient KYC document parsing error that self-resolved within 5 minutes.',
+    businessRiskSummary:
+      'No significant business risk identified this week. The single KYC parsing failure was transient and did not result in any data loss or compliance gaps. All regulatory filing reminders were delivered on schedule.',
+    agencyActionSummary:
+      'No urgent action required. Monitor the KYC Document Parsing workflow for recurring transient errors during peak hours. Consider scheduling a quarterly review of KYC document format requirements to preempt future parsing issues.',
   },
+  // ──── NovaTech SaaS — current week ────
   {
     id: 'rpt_03', clientId: 'client_03', clientName: 'NovaTech SaaS',
     periodStart: d(7), periodEnd: d(0),
-    status: 'draft', totalRuns: 1543, successRate: 84.1,
-    totalFailures: 245, meanTimeToRecovery: 47,
+    status: 'draft',
+    totalRuns: 1543, successfulRuns: 1298, failedRuns: 245, silentIssues: 8,
+    healthScore: 52,
     generatedAt: d(0, 8, 0),
+    executiveSummary:
+      'NovaTech SaaS experienced a significantly degraded automation week with an 84.1% success rate across 1,543 runs. Three workflows are in critical or warning state: User Onboarding Sequence (health 22), Stripe Billing Webhook (health 15), and Revenue Dashboard Refresh (health 30). The Stripe Billing Webhook alone accounted for 18 failures including duplicate invoice detection and webhook signature mismatches.',
+    businessRiskSummary:
+      'User Onboarding Sequence failures mean new users may not be fully provisioned, directly impacting activation rates. Stripe Billing Webhook failures create a risk of duplicate invoices or missed billing events, which could result in revenue leakage or customer complaints. Revenue Dashboard Refresh showed stale cached data in a silent issue, meaning leadership may have been making decisions on outdated financial metrics.',
+    agencyActionSummary:
+      'Immediately investigate the Stripe webhook signature configuration and idempotency key handling to stop duplicate invoice creation. Review the User Onboarding database connection pool settings and increase capacity. Audit the Revenue Dashboard Refresh cache TTL configuration and restore live query behavior. Verify silent issue detection rules for all three critical workflows.',
   },
+  // ──── BrightPath Health — current week ────
   {
     id: 'rpt_04', clientId: 'client_04', clientName: 'BrightPath Health',
     periodStart: d(7), periodEnd: d(0),
-    status: 'sent', totalRuns: 620, successRate: 91.6,
-    totalFailures: 52, meanTimeToRecovery: 28,
+    status: 'sent',
+    totalRuns: 620, successfulRuns: 568, failedRuns: 52, silentIssues: 3,
+    healthScore: 71,
     generatedAt: d(0, 7, 0), sentAt: d(0, 7, 45),
+    executiveSummary:
+      'BrightPath Health maintained moderate automation reliability at 91.6% across 620 runs. The Insurance Claim Router and Patient Appointment Reminders workflows drove most issues this week. Lab Results Ingestion and Telehealth Session Scheduler performed well with no failures. The overall client health score sits at 71, pulled down by the claims processing pipeline.',
+    businessRiskSummary:
+      'Insurance Claim Router had 4 failures including an HL7 parser timeout on an oversized document and repeated 502 errors from the external claims API, meaning some insurance claims may not have been routed to the correct processing queue. Patient Appointment Reminders had a silent issue where all 12 scheduled reminders failed to send because the phone_number field was empty in the CRM, meaning patients did not receive their appointment notifications.',
+    agencyActionSummary:
+      'Investigate the CRM sync pipeline that feeds Patient Appointment Reminders to confirm why phone_number fields are being dropped. Contact the external claims API provider about the 502 errors and implement circuit-breaker logic. Review HL7 document size limits and add pre-validation before the parser step. Confirm silent issue rules are monitoring required field presence across all patient communication workflows.',
   },
+  // ──── Summit Logistics — current week ────
   {
     id: 'rpt_05', clientId: 'client_05', clientName: 'Summit Logistics',
     periodStart: d(7), periodEnd: d(0),
-    status: 'sent', totalRuns: 285, successRate: 100.0,
-    totalFailures: 0, meanTimeToRecovery: 0,
+    status: 'sent',
+    totalRuns: 285, successfulRuns: 285, failedRuns: 0, silentIssues: 0,
+    healthScore: 96,
     generatedAt: d(0, 6, 0), sentAt: d(0, 6, 20),
+    executiveSummary:
+      'Summit Logistics achieved a perfect 100% success rate this week across all 285 workflow runs. Shipment Tracking Sync, Driver Payroll Calculation, and Customer Notification Pipeline all operated without a single failure or silent issue. This is the third consecutive week with zero incidents for this client.',
+    businessRiskSummary:
+      'No business risk identified. All logistics tracking, payroll, and customer notification workflows ran flawlessly. No silent issues were detected, confirming that all payload data met expected quality standards.',
+    agencyActionSummary:
+      'No action required this week. Continue monitoring as usual. Consider using Summit Logistics workflows as a reliability benchmark for other clients during quarterly business reviews.',
   },
+  // ──── GreenLeaf Commerce — previous week ────
   {
     id: 'rpt_06', clientId: 'client_01', clientName: 'GreenLeaf Commerce',
     periodStart: d(14), periodEnd: d(7),
-    status: 'sent', totalRuns: 810, successRate: 96.5,
-    totalFailures: 28, meanTimeToRecovery: 15,
+    status: 'sent',
+    totalRuns: 810, successfulRuns: 782, failedRuns: 28, silentIssues: 1,
+    healthScore: 83,
     generatedAt: d(7, 10, 0), sentAt: d(7, 10, 30),
+    executiveSummary:
+      'GreenLeaf Commerce maintained solid reliability at 96.5% across 810 runs last week. All six workflows operated normally except for minor SendGrid delays on the Order Confirmation Emails workflow. One silent issue was detected in the Review Aggregation workflow where the source API returned zero new reviews for three consecutive runs.',
+    businessRiskSummary:
+      'The 28 SendGrid timeout failures on Order Confirmation Emails meant some customers experienced delayed confirmation messages. The Review Aggregation silent issue did not pose direct business risk but indicated a potential upstream API change that should be monitored.',
+    agencyActionSummary:
+      'Review SendGrid delivery logs from last week to confirm all delayed emails were eventually delivered. Check the Review Aggregation source API for rate limiting or schema changes that may have caused the empty result sets.',
   },
+  // ──── NovaTech SaaS — previous week ────
   {
     id: 'rpt_07', clientId: 'client_03', clientName: 'NovaTech SaaS',
     periodStart: d(14), periodEnd: d(7),
-    status: 'sent', totalRuns: 1480, successRate: 88.3,
-    totalFailures: 173, meanTimeToRecovery: 38,
+    status: 'sent',
+    totalRuns: 1480, successfulRuns: 1307, failedRuns: 173, silentIssues: 5,
+    healthScore: 48,
     generatedAt: d(7, 8, 0), sentAt: d(7, 8, 45),
+    executiveSummary:
+      'NovaTech SaaS had a difficult week with an 88.3% success rate across 1,480 runs. The User Onboarding Sequence and Stripe Billing Webhook workflows were the primary contributors to the 173 failures. Five silent issues were detected across the analytics workflows where data freshness and record processing rules were violated.',
+    businessRiskSummary:
+      'The high failure count in User Onboarding Sequence directly impacted new user activation, with an estimated 40+ users affected by incomplete onboarding. Stripe Billing Webhook failures risked billing inconsistencies for SaaS subscribers. Silent issues in the analytics workflows meant churn risk scores and revenue data may have been unreliable for parts of the week.',
+    agencyActionSummary:
+      'Prioritise database connection pool scaling for the User Onboarding Sequence. Audit all Stripe webhook event handling for idempotency and signature validation. Review analytics workflow data source configurations and refresh intervals. Schedule a reliability review call with the NovaTech team.',
   },
 ];
 

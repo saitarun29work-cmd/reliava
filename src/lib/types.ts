@@ -89,12 +89,22 @@ export interface Report {
   periodStart: string;
   periodEnd: string;
   status: ReportStatus;
+  // Locked V1 count formulas:
+  //   totalRuns     = successfulRuns + failedRuns
+  //   successfulRuns = success events
+  //   failedRuns     = failure events
+  //   silentIssues   = silent_issue events (not counted as a run)
   totalRuns: number;
-  successRate: number;
-  totalFailures: number;
-  meanTimeToRecovery: number; // minutes
+  successfulRuns: number;
+  failedRuns: number;
+  silentIssues: number;
+  healthScore: number; // average client health at report generation time
   generatedAt: string;
   sentAt?: string;
+  // Report narrative sections
+  executiveSummary: string;
+  businessRiskSummary: string;
+  agencyActionSummary: string;
 }
 
 export interface Alert {
