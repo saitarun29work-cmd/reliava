@@ -7,10 +7,11 @@ import { NextRequest, NextResponse } from 'next/server';
  * Each workflow has a unique ingest token and webhook URL.
  * In production, this would:
  *   1. Validate the ingest token from the URL path or Authorization header
- *   2. Parse the request body (outcome, message, metadata)
+ *   2. Parse the request body (event_type, payload_summary)
  *   3. Create a WorkflowEvent record in the database
- *   4. Evaluate issue rules and create alerts if needed
- *   5. Update workflow health score and status
+ *   4. Evaluate payload_summary against issue rules (detect silent issues)
+ *   5. Create alerts if needed
+ *   6. Update workflow health score and status
  *
  * For MVP, this returns a success response for valid payloads.
  */
@@ -29,18 +30,18 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { outcome, message } = body;
+    const { event_type, payload_summary } = body;
 
-    if (!outcome || !message) {
+    if (!event_type || !payload_summary) {
       return NextResponse.json(
-        { error: 'Missing required fields: outcome and message.' },
+        { error: 'Missing required fields: event_type and payload_summary.' },
         { status: 400 }
       );
     }
 
-    if (!['success', 'failure'].includes(outcome)) {
+    if (!['success', 'failure', 'silent_issue'].includes(event_type)) {
       return NextResponse.json(
-        { error: 'Invalid outcome. Must be "success" or "failure".' },
+        { error: 'Invalid event_type. Must be "success", "failure", or "silent_issue".' },
         { status: 400 }
       );
     }
@@ -50,9 +51,8 @@ export async function POST(
       status: 'ok',
       received: {
         tokenId,
-        outcome,
-        message,
-        metadata: body.metadata ?? null,
+        event_type,
+        payload_summary,
         timestamp: new Date().toISOString(),
       },
     });

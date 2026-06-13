@@ -84,7 +84,7 @@ function TimelineEventCard({
   isLast: boolean;
 }) {
   const [metaOpen, setMetaOpen] = useState(false);
-  const hasMetadata = event.metadata && Object.keys(event.metadata).length > 0;
+  const hasPayload = event.payload_summary && Object.keys(event.payload_summary).length > 0;
 
   return (
     <div className="flex gap-4">
@@ -106,28 +106,47 @@ function TimelineEventCard({
             <TimeAgo date={event.timestamp} />
           </div>
 
-          {/* Message */}
-          <p className="text-sm text-foreground">{event.message}</p>
-
-          {/* Silent badge */}
-          {event.isSilent && (
-            <span className="inline-block mt-2 text-amber-400 text-xs bg-amber-500/10 rounded px-1.5 py-0.5">
-              Silent failure — no alert fired
-            </span>
+          {/* Summary line */}
+          {event.event_type === 'silent_issue' && event.payload_summary.reason ? (
+            <p className="text-sm text-foreground">{String(event.payload_summary.reason)}</p>
+          ) : event.payload_summary.error_message ? (
+            <p className="text-sm text-foreground">{String(event.payload_summary.error_message)}</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {event.event_type === 'success' ? 'Workflow completed successfully' : 'Event recorded'}
+            </p>
           )}
 
-          {/* Collapsible metadata */}
-          {hasMetadata && (
+          {/* Event type badge */}
+          <div className="flex items-center gap-2 mt-2">
+            <span className={
+              event.event_type === 'success'
+                ? 'inline-block text-xs bg-emerald-500/10 text-emerald-400 rounded px-1.5 py-0.5'
+                : event.event_type === 'failure'
+                  ? 'inline-block text-xs bg-red-500/10 text-red-400 rounded px-1.5 py-0.5'
+                  : 'inline-block text-xs bg-amber-500/10 text-amber-400 rounded px-1.5 py-0.5'
+            }>
+              {event.event_type === 'silent_issue' ? 'Silent issue' : event.event_type}
+            </span>
+            {event.event_type === 'silent_issue' && (
+              <span className="text-xs text-muted-foreground">
+                Success event with payload violation
+              </span>
+            )}
+          </div>
+
+          {/* Collapsible payload_summary */}
+          {hasPayload && (
             <Collapsible open={metaOpen} onOpenChange={setMetaOpen} className="mt-3">
               <CollapsibleTrigger className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 <ChevronDown
                   className={`size-3.5 transition-transform ${metaOpen ? 'rotate-180' : ''}`}
                 />
-                {metaOpen ? 'Hide' : 'Show'} metadata
+                {metaOpen ? 'Hide' : 'Show'} payload
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
                 <div className="bg-muted rounded-md p-3 font-mono text-xs text-foreground">
-                  {Object.entries(event.metadata!).map(([key, value]) => (
+                  {Object.entries(event.payload_summary).map(([key, value]) => (
                     <div key={key} className="flex gap-2">
                       <span className="text-muted-foreground">{key}:</span>
                       <span>{JSON.stringify(value)}</span>

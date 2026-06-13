@@ -5,7 +5,7 @@
 export type Platform = 'n8n';
 export type WorkflowStatus = 'healthy' | 'warning' | 'critical' | 'inactive';
 export type EventSeverity = 'info' | 'warning' | 'error' | 'critical';
-export type EventOutcome = 'success' | 'failure';
+export type EventType = 'success' | 'failure' | 'silent_issue';
 export type Criticality = 'low' | 'medium' | 'high' | 'critical';
 export type ReportStatus = 'draft' | 'sent' | 'viewed';
 export type AlertStatus = 'active' | 'acknowledged' | 'resolved';
@@ -66,11 +66,9 @@ export interface WorkflowEvent {
   clientId: string;
   clientName: string;
   severity: EventSeverity;
-  outcome: EventOutcome;
-  message: string;
-  metadata?: Record<string, unknown>;
+  event_type: EventType;
+  payload_summary: Record<string, unknown>;
   timestamp: string;
-  isSilent: boolean; // failure with no alert fired
 }
 
 export interface IssueRule {

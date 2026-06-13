@@ -84,16 +84,14 @@ model Workflow {
 
 // ---- WorkflowEvent ----
 model WorkflowEvent {
-  id            String   @id @default(cuid())
-  workflowId    String
-  severity      String   @default("info") // info | warning | error | critical
-  outcome       String   @default("success") // success | failure
-  message       String
-  metadata      String?  // JSON string
-  isSilent      Boolean  @default(false)
-  timestamp     DateTime @default(now())
+  id             String   @id @default(cuid())
+  workflowId     String
+  severity       String   @default("info") // info | warning | error | critical
+  eventType      String   @default("success") // success | failure | silent_issue
+  payloadSummary String   // JSON string
+  timestamp      DateTime @default(now())
 
-  workflow      Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflow       Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }
 
 // ---- IssueRule ----

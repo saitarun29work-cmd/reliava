@@ -38,3 +38,25 @@ Stage Summary:
 - Backend logic separated from UI (API routes, lib layer)
 - Environment variables used (not hardcoded secrets)
 - Code is clean and ready for GitHub/self-host
+---
+Task ID: 1
+Agent: main
+Task: V1 UI cleanup — align internal event schema to event_type/payload_summary, verify all 7 items
+
+Work Log:
+- Audited all 7 requested items. Items 1-4 were already correct (branding, tagline, agency read-only, integrations 3-card, workflow detail snippets).
+- Found internal schema mismatch: types.ts still used `outcome`/`message`/`isSilent`/`metadata` while the webhook snippets already used `event_type`/`payload_summary`.
+- Patched types.ts: renamed `EventOutcome` → `EventType` ('success'|'failure'|'silent_issue'), replaced `WorkflowEvent` fields (outcome→event_type, message→removed, metadata→removed, isSilent→removed, added payload_summary).
+- Patched mock-data.ts: rewrote all 18 events (9 failure, 5 success, 4 silent_issue) with correct schema. Silent issues now represent success events where payload_summary violates a rule (e.g. 0 records synced, empty phone fields, stale cache data).
+- Patched event-timeline.tsx: replaced `event.message` rendering with smart payload display (reason for silent_issue, error_message for failure, generic for success). Added color-coded event_type badges. Changed collapsible from "metadata" to "payload".
+- Patched ingest API route: updated to validate `event_type`/`payload_summary` instead of `outcome`/`message`/`metadata`.
+- Patched Prisma schema: aligned WorkflowEvent model (eventType, payloadSummary, removed outcome/message/metadata/isSilent).
+- Updated computeDashboardStats to use `e.event_type === 'failure'` and `e.event_type === 'silent_issue'`.
+- Verified zero references to old field names remain in codebase.
+- Build passes cleanly.
+
+Stage Summary:
+- 4 files edited (types.ts, mock-data.ts, event-timeline.tsx, ingest route)
+- 1 Prisma schema aligned
+- All 7 user-requested items verified correct
+- Build successful, no TypeScript errors

@@ -336,126 +336,221 @@ export const mockWorkflows: Workflow[] = [
 ];
 
 // ---- Events ----
+// event_type values:
+//   "success"      — workflow completed normally
+//   "failure"      — workflow threw an error or returned a non-2xx status
+//   "silent_issue" — workflow reported success but payload_summary violates a rule
+//                     (e.g. synced 0 records, all recipients bounced, missing required fields)
 export const mockEvents: WorkflowEvent[] = [
+  // ──── Failure events ────
   {
     id: cuid('evt'), workflowId: 'wf_07', workflowName: 'Stripe Billing Webhook',
     clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'critical', outcome: 'failure',
-    message: 'Webhook signature verification failed. Stripe payload rejected.',
-    metadata: { statusCode: 401, errorCode: 'SIG_MISMATCH' },
-    timestamp: d(0, 0, 45), isSilent: true,
+    severity: 'critical', event_type: 'failure',
+    payload_summary: {
+      error_message: 'Webhook signature verification failed',
+      error_code: 'SIG_MISMATCH',
+      status_code: 401,
+    },
+    timestamp: d(0, 0, 45),
   },
   {
     id: cuid('evt'), workflowId: 'wf_06', workflowName: 'User Onboarding Sequence',
     clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'critical', outcome: 'failure',
-    message: 'Database connection pool exhausted. Unable to insert user record.',
-    metadata: { statusCode: 503, errorCode: 'DB_POOL_EXHAUSTED' },
-    timestamp: d(0, 1, 30), isSilent: false,
+    severity: 'critical', event_type: 'failure',
+    payload_summary: {
+      error_message: 'Database connection pool exhausted. Unable to insert user record.',
+      error_code: 'DB_POOL_EXHAUSTED',
+      status_code: 503,
+    },
+    timestamp: d(0, 1, 30),
   },
   {
     id: cuid('evt'), workflowId: 'wf_18', workflowName: 'Insurance Claim Router',
     clientId: 'client_04', clientName: 'BrightPath Health',
-    severity: 'error', outcome: 'failure',
-    message: 'HL7 parser timeout. Claim document exceeded 10MB limit.',
-    metadata: { statusCode: 413, errorCode: 'PAYLOAD_TOO_LARGE' },
-    timestamp: d(0, 2, 0), isSilent: true,
+    severity: 'error', event_type: 'failure',
+    payload_summary: {
+      error_message: 'HL7 parser timeout. Claim document exceeded 10MB limit.',
+      error_code: 'PAYLOAD_TOO_LARGE',
+      status_code: 413,
+    },
+    timestamp: d(0, 2, 0),
   },
   {
     id: cuid('evt'), workflowId: 'wf_22', workflowName: 'Revenue Dashboard Refresh',
     clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'error', outcome: 'failure',
-    message: 'BigQuery API rate limit exceeded. Retry after 60s.',
-    metadata: { statusCode: 429, errorCode: 'RATE_LIMITED' },
-    timestamp: d(0, 3, 0), isSilent: true,
+    severity: 'error', event_type: 'failure',
+    payload_summary: {
+      error_message: 'BigQuery API rate limit exceeded. Retry after 60s.',
+      error_code: 'RATE_LIMITED',
+      status_code: 429,
+    },
+    timestamp: d(0, 3, 0),
   },
   {
     id: cuid('evt'), workflowId: 'wf_10', workflowName: 'Patient Appointment Reminders',
     clientId: 'client_04', clientName: 'BrightPath Health',
-    severity: 'warning', outcome: 'failure',
-    message: 'SMS gateway returned partial delivery. 3 of 12 messages undelivered.',
-    metadata: { statusCode: 206, errorCode: 'PARTIAL_DELIVERY' },
-    timestamp: d(0, 4, 0), isSilent: false,
+    severity: 'warning', event_type: 'failure',
+    payload_summary: {
+      error_message: 'SMS gateway returned partial delivery. 3 of 12 messages undelivered.',
+      error_code: 'PARTIAL_DELIVERY',
+      status_code: 206,
+      delivered: 9,
+      undelivered: 3,
+    },
+    timestamp: d(0, 4, 0),
   },
   {
     id: cuid('evt'), workflowId: 'wf_02', workflowName: 'Order Confirmation Emails',
     clientId: 'client_01', clientName: 'GreenLeaf Commerce',
-    severity: 'warning', outcome: 'failure',
-    message: 'SendGrid API timeout. Email queue backed up (147 pending).',
-    metadata: { statusCode: 504, errorCode: 'SMTP_TIMEOUT' },
-    timestamp: d(0, 6, 20), isSilent: true,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_08', workflowName: 'Churn Risk Analysis',
-    clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'warning', outcome: 'failure',
-    message: 'ML model scoring service returned invalid response schema.',
-    metadata: { statusCode: 500, errorCode: 'SCHEMA_MISMATCH' },
-    timestamp: d(0, 10, 0), isSilent: true,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_01', workflowName: 'Shopify → CRM Sync',
-    clientId: 'client_01', clientName: 'GreenLeaf Commerce',
-    severity: 'info', outcome: 'success',
-    message: 'Synced 34 customer records from Shopify to HubSpot CRM.',
-    metadata: { recordsProcessed: 34, duration: '2.3s' },
-    timestamp: d(0, 2, 15), isSilent: false,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_12', workflowName: 'Shipment Tracking Sync',
-    clientId: 'client_05', clientName: 'Summit Logistics',
-    severity: 'info', outcome: 'success',
-    message: 'Updated 89 shipment statuses via CarrierPro API.',
-    metadata: { recordsProcessed: 89, duration: '4.1s' },
-    timestamp: d(0, 0, 30), isSilent: false,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_04', workflowName: 'Daily Portfolio Report',
-    clientId: 'client_02', clientName: 'Apex Financial',
-    severity: 'info', outcome: 'success',
-    message: 'Generated and distributed portfolio report to 12 advisors.',
-    metadata: { recipients: 12, duration: '8.7s' },
-    timestamp: d(0, 5, 0), isSilent: false,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_15', workflowName: 'Abandoned Cart Recovery',
-    clientId: 'client_01', clientName: 'GreenLeaf Commerce',
-    severity: 'info', outcome: 'success',
-    message: 'Sent 23 abandoned cart recovery emails. 4 conversions recorded.',
-    metadata: { emailsSent: 23, conversions: 4, duration: '3.5s' },
-    timestamp: d(0, 0, 50), isSilent: false,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_11', workflowName: 'Lab Results Ingestion',
-    clientId: 'client_04', clientName: 'BrightPath Health',
-    severity: 'info', outcome: 'success',
-    message: 'Ingested 15 lab results from Quest Diagnostics HL7 feed.',
-    metadata: { recordsProcessed: 15, duration: '1.9s' },
-    timestamp: d(0, 1, 45), isSilent: false,
-  },
-  {
-    id: cuid('evt'), workflowId: 'wf_07', workflowName: 'Stripe Billing Webhook',
-    clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'critical', outcome: 'failure',
-    message: 'Duplicate invoice detected. Idempotency key collision on payment_intent.succeeded.',
-    metadata: { errorCode: 'DUPLICATE_INVOICE' },
-    timestamp: d(0, 5, 0), isSilent: true,
+    severity: 'warning', event_type: 'failure',
+    payload_summary: {
+      error_message: 'SendGrid API timeout. Email queue backed up (147 pending).',
+      error_code: 'SMTP_TIMEOUT',
+      status_code: 504,
+    },
+    timestamp: d(0, 6, 20),
   },
   {
     id: cuid('evt'), workflowId: 'wf_06', workflowName: 'User Onboarding Sequence',
     clientId: 'client_03', clientName: 'NovaTech SaaS',
-    severity: 'error', outcome: 'failure',
-    message: 'Welcome email template not found in SendGrid. Workflow halted at step 3/7.',
-    metadata: { errorCode: 'TEMPLATE_MISSING', step: 3, totalSteps: 7 },
-    timestamp: d(0, 8, 0), isSilent: false,
+    severity: 'error', event_type: 'failure',
+    payload_summary: {
+      error_message: 'Welcome email template not found in SendGrid. Workflow halted at step 3/7.',
+      error_code: 'TEMPLATE_MISSING',
+      step: 3,
+      total_steps: 7,
+    },
+    timestamp: d(0, 8, 0),
   },
   {
     id: cuid('evt'), workflowId: 'wf_18', workflowName: 'Insurance Claim Router',
     clientId: 'client_04', clientName: 'BrightPath Health',
-    severity: 'warning', outcome: 'failure',
-    message: 'External claims API returned 502. Retried 3 times, all failed.',
-    metadata: { statusCode: 502, retries: 3, errorCode: 'UPSTREAM_UNAVAILABLE' },
-    timestamp: d(0, 8, 30), isSilent: false,
+    severity: 'warning', event_type: 'failure',
+    payload_summary: {
+      error_message: 'External claims API returned 502. Retried 3 times, all failed.',
+      error_code: 'UPSTREAM_UNAVAILABLE',
+      status_code: 502,
+      retries: 3,
+    },
+    timestamp: d(0, 8, 30),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_07', workflowName: 'Stripe Billing Webhook',
+    clientId: 'client_03', clientName: 'NovaTech SaaS',
+    severity: 'critical', event_type: 'failure',
+    payload_summary: {
+      error_message: 'Duplicate invoice detected. Idempotency key collision on payment_intent.succeeded.',
+      error_code: 'DUPLICATE_INVOICE',
+    },
+    timestamp: d(0, 5, 0),
+  },
+
+  // ──── Success events ────
+  {
+    id: cuid('evt'), workflowId: 'wf_01', workflowName: 'Shopify → CRM Sync',
+    clientId: 'client_01', clientName: 'GreenLeaf Commerce',
+    severity: 'info', event_type: 'success',
+    payload_summary: {
+      records_synced: 34,
+      records_skipped: 2,
+      duration_seconds: 2.3,
+    },
+    timestamp: d(0, 2, 15),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_12', workflowName: 'Shipment Tracking Sync',
+    clientId: 'client_05', clientName: 'Summit Logistics',
+    severity: 'info', event_type: 'success',
+    payload_summary: {
+      shipments_updated: 89,
+      duration_seconds: 4.1,
+    },
+    timestamp: d(0, 0, 30),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_04', workflowName: 'Daily Portfolio Report',
+    clientId: 'client_02', clientName: 'Apex Financial',
+    severity: 'info', event_type: 'success',
+    payload_summary: {
+      report_recipients: 12,
+      duration_seconds: 8.7,
+    },
+    timestamp: d(0, 5, 0),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_15', workflowName: 'Abandoned Cart Recovery',
+    clientId: 'client_01', clientName: 'GreenLeaf Commerce',
+    severity: 'info', event_type: 'success',
+    payload_summary: {
+      emails_sent: 23,
+      conversions: 4,
+      duration_seconds: 3.5,
+    },
+    timestamp: d(0, 0, 50),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_11', workflowName: 'Lab Results Ingestion',
+    clientId: 'client_04', clientName: 'BrightPath Health',
+    severity: 'info', event_type: 'success',
+    payload_summary: {
+      lab_results_ingested: 15,
+      duration_seconds: 1.9,
+    },
+    timestamp: d(0, 1, 45),
+  },
+
+  // ──── Silent issue events ────
+  // These are events where n8n reported success, but the payload_summary
+  // reveals a business-logic problem (e.g. 0 records synced, all emails bounced).
+  {
+    id: cuid('evt'), workflowId: 'wf_08', workflowName: 'Churn Risk Analysis',
+    clientId: 'client_03', clientName: 'NovaTech SaaS',
+    severity: 'warning', event_type: 'silent_issue',
+    payload_summary: {
+      rule_violated: 'records_processed_must_be_gt_zero',
+      records_scored: 0,
+      expected_min_records: 50,
+      reason: 'Source query returned empty result set — possible API schema change',
+    },
+    timestamp: d(0, 10, 0),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_22', workflowName: 'Revenue Dashboard Refresh',
+    clientId: 'client_03', clientName: 'NovaTech SaaS',
+    severity: 'warning', event_type: 'silent_issue',
+    payload_summary: {
+      rule_violated: 'data_freshness_must_be_within_1h',
+      data_freshness_minutes: 180,
+      rows_returned: 890,
+      reason: 'Cached data served instead of live query — cache TTL misconfigured',
+    },
+    timestamp: d(0, 3, 15),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_10', workflowName: 'Patient Appointment Reminders',
+    clientId: 'client_04', clientName: 'BrightPath Health',
+    severity: 'warning', event_type: 'silent_issue',
+    payload_summary: {
+      rule_violated: 'phone_field_required',
+      reminders_sent: 0,
+      patients_scheduled: 12,
+      missing_phone_count: 12,
+      reason: 'All 12 patients had empty phone_number field — CRM sync may be dropping this field',
+    },
+    timestamp: d(0, 5, 0),
+  },
+  {
+    id: cuid('evt'), workflowId: 'wf_01', workflowName: 'Shopify → CRM Sync',
+    clientId: 'client_01', clientName: 'GreenLeaf Commerce',
+    severity: 'warning', event_type: 'silent_issue',
+    payload_summary: {
+      rule_violated: 'new_records_must_be_gt_zero',
+      records_synced: 0,
+      records_skipped: 34,
+      reason: 'All 34 records were skipped due to duplicate email — dedup rule may be too aggressive',
+    },
+    timestamp: d(0, 4, 30),
   },
 ];
 
@@ -614,11 +709,11 @@ export function computeDashboardStats(
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   const failedRunsThisWeek = events.filter(
-    (e) => e.outcome === 'failure' && new Date(e.timestamp) >= weekAgo
+    (e) => e.event_type === 'failure' && new Date(e.timestamp) >= weekAgo
   ).length;
 
   const silentIssuesThisWeek = events.filter(
-    (e) => e.isSilent && new Date(e.timestamp) >= weekAgo
+    (e) => e.event_type === 'silent_issue' && new Date(e.timestamp) >= weekAgo
   ).length;
 
   const criticalEventsLast24h = events.filter(
