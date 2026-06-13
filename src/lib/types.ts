@@ -90,21 +90,26 @@ export interface Report {
   periodEnd: string;
   status: ReportStatus;
   // Locked V1 count formulas:
-  //   totalRuns     = successfulRuns + failedRuns
-  //   successfulRuns = success events
-  //   failedRuns     = failure events
-  //   silentIssues   = silent_issue events (not counted as a run)
+  //   totalRuns          = successfulRuns + failedRuns
+  //   successfulRuns     = success events
+  //   failedRuns         = failure events
+  //   silentIssues       = silent_issue events (not counted as a run)
   totalRuns: number;
   successfulRuns: number;
   failedRuns: number;
   silentIssues: number;
-  healthScore: number; // average client health at report generation time
+  workflowsMonitored: number;
+  criticalEvents: number;
+  healthScore: number;
   generatedAt: string;
   sentAt?: string;
   // Report narrative sections
   executiveSummary: string;
+  healthExplanation: string;
+  whatWorkedWell: string[];
   businessRiskSummary: string;
   agencyActionSummary: string;
+  closingNote: string;
 }
 
 export interface Alert {

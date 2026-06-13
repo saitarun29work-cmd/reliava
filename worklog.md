@@ -78,3 +78,34 @@ Stage Summary:
 - 3 files changed (types.ts, mock-data.ts, client-reports-tab.tsx)
 - Report format locked: total_runs = success + failure, silent_issues counted separately
 - All 5 clients have 1-2 reports with realistic narratives
+
+---
+Task ID: 3
+Agent: main
+Task: Upgrade Client Reports page into client-ready weekly automation reliability report
+
+Work Log:
+- Added 5 new fields to Report type: workflowsMonitored, criticalEvents, healthExplanation, whatWorkedWell[], closingNote
+- Rewrote all 7 mock reports with client-ready tone ("Your automation system ran..."), health explanations, what-worked-well bullet points, and closing notes
+- Complete rewrite of client-reports-tab.tsx with 10 sections:
+  1. Header: title, subtitle, client name + industry, period, health score + Healthy/Warning/Critical badge
+  2. 6-column stats grid: Total Runs, Successful, Failed, Silent Issues, Workflows, Critical Events
+  3. Executive Summary
+  4. Automation Health Score: score, status badge, explanation paragraph
+  5. What Worked Well: green checkmark bullet list
+  6. Failures Detected: table from live events grouped by workflow, showing severity, last failure time, error message, derived business impact
+  7. Silent Issues Detected: amber-tinted table from live events, showing rule violated, time, derived business impact, with explanation intro paragraph
+  8. Business Risk Summary
+  9. Agency Action Summary
+  10. Workflows Needing Attention: top 3 with status, fails, silent, health, recommended action
+  11. Client-Friendly Closing Note (emerald-tinted card with sparkle icon)
+  12. Past Reports compact list
+- Added helper functions: deriveBusinessImpact(), getRecommendedAction(), health status/color utilities
+- Failure and silent issue tables pull from live store events filtered by clientId
+- Build passes clean
+
+Stage Summary:
+- 3 files changed (types.ts, mock-data.ts, client-reports-tab.tsx)
+- Report feels like an agency deliverable, not a technical dashboard
+- Silent issues section has prominent explanation that these are quality problems from successful runs
+- All narrative text uses client-friendly language
